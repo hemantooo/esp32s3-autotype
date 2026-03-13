@@ -5,8 +5,8 @@
 
 // ── CONFIG ───────────────────────────────────────────────
 // Option A: Join existing WiFi (phone + ESP32 on same network)
-const char* WIFI_SSID     = "hem";
-const char* WIFI_PASSWORD = "222345678";
+const char* WIFI_SSID     = "YOUR_WIFI_SSID";
+const char* WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
 
 // Option B: ESP32 creates its own hotspot — set USE_AP = true
 //           Then connect your phone to "KeyPad-ESP32" / password below
