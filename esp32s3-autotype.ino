@@ -83,34 +83,34 @@ void handlePing() {
   server.send(200, "application/json", "{\"ok\":true,\"device\":\"ESP32-S3 KeyPad\"}");
 }
 
-void handleType() {
+void handleType() { 
   setCORSHeaders();
   if (server.method() == HTTP_OPTIONS) {
-    server.send(204);
-    return;
+    server.send(204); return;
   }
   if (!server.hasArg("plain")) {
-    server.send(400, "application/json", "{\"ok\":false,\"error\":\"No body\"}");
+    server.send(400, "application/json", "{\"ok\":false,\"error\":\"No body\"}"); 
     return;
-  }
-  String body     = server.arg("plain");
-  String text     = extractJsonString(body, "text");
-  int    delay_ms = extractJsonInt(body, "delay", 30);
-
-  if (text.length() == 0) {
-    server.send(400, "application/json", "{\"ok\":false,\"error\":\"Empty text\"}");
-    return;
-  }
-
-  delay_ms = constrain(delay_ms, 0, 200);
-  Serial.printf("[TYPE] %d chars @ %d ms delay\n", text.length(), delay_ms);
-  server.send(200, "application/json", "{\"ok\":true}");
-
-  for (int i = 0; i < (int)text.length(); i++) {
-    typeChar(text[i]);
-    if (delay_ms > 0) delay(delay_ms);
-  }
-  Serial.println("[TYPE] Done.");
+  } 
+  String body = server.arg("plain"); 
+  String text = extractJsonString(body, "text"); 
+  int delay_ms = extractJsonInt(body, "delay", 30); 
+  if (text.length() == 0) { 
+    server.send(400, "application/json", "{\"ok\":false,\"error\":\"Empty text\"}"); 
+    return; 
+  } 
+  delay_ms = constrain(delay_ms, 0, 200); 
+  Serial.printf("[TYPE] %d chars @ %d ms delay\n", text.length(), delay_ms); 
+  server.send(200, "application/json", "{\"ok\":true}"); 
+  bool lastWasEnter = false; 
+  for (int i = 0; i < text.length(); i++) { 
+    char c = text[i]; // Skip tabs/spaces after auto-indented newline 
+    if (lastWasEnter && (c == '\t' || c == ' ')) { continue; } // Skip auto-closing characters 
+    if (c == ')' || c == '}' || c == ']' || c == '"' || c == '\'') { continue; } 
+    if (c == '\n') { Keyboard.press(KEY_RETURN); Keyboard.release(KEY_RETURN); lastWasEnter = true; } 
+    else { typeChar(c); lastWasEnter = false; } 
+    
+    if (delay_ms > 0) delay(delay_ms); } Serial.println("[TYPE] Done."); 
 }
 
 void setup() {
